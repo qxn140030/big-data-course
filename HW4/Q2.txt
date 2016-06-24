@@ -1,0 +1,15 @@
+/*
+ * Using Pig Latin script.
+ * Implement co-group command on MovieID for the datasets ratings and movies. 
+ * Print first 5 rows.
+ */
+
+MOVIES = load 'hdfs://cshadoop1/Spring-2016-input/movies.dat' using PigStorage(':') as (MovieID:chararray, Titile:chararray, Genres:chararray);
+
+RATINGS = load 'hdfs://cshadoop1/Spring-2016-input/ratings.dat' using PigStorage(':') as (UserID:chararray, MovieID:chararray, Rating:float, Timestamp:chararray);
+
+M_R = cogroup RATINGS by MovieID, MOVIES by MovieID;
+
+RESULT = limit M_R 5;
+
+dump RESULT
