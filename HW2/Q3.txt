@@ -1,0 +1,36 @@
+spark-shell
+
+object Q3 {
+    def main(args: Array[String]) {
+        if (args.length != 2 ) {
+            println("usage: Q3 p1 p2")
+            sys.exit(-1)
+        }
+        val soc = sc.textFile("/socNetData/networkdata/soc-LiveJournal1Adj.txt")
+        val userdata = sc.textFile("/socNetData/userdata/userdata.txt")
+        val p1 = args(0)
+        val p2 = args(1)
+
+	val f1 = soc.filter(line => line.split("\t")(0) == p1)
+	      .map(line => line.split("\t")(1))
+		    .flatMap(line => line.split(","))
+
+        val f2 = soc.filter(line => line.split("\t")(0) == p2)
+		    .map(line => line.split("\t")(1))
+		    .flatMap(line => line.split(","))
+
+        var nameZip = userdata.map {
+            line => (line.split(",")(0), line.split(",")(1) + ":" + line.split(",")(6))
+        }.collectAsMap
+
+        var bc = sc.broadcast(nameZip)
+        var bcVal = bc.value
+
+        val rst = f1.intersection(f2).collect()
+		    .map(line => bcVal.get(line).getOrElse("")).mkString(",")
+
+        println(p1 + " " + p2 + "\t" + "[" + rst + "]")
+    }
+}
+
+Q3.main(Array("9993","9991"))
