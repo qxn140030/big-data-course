@@ -1,0 +1,45 @@
+spark-shell
+
+def direct_friend_pair(line: (String, Array[String])): Array[(String, Int)] = {
+    val rst = new Array[(String, Int)](line._2.length)
+    for(i <- 0 to line._2.length - 1) {
+        rst(i) = Tuple2(line._2(i), line._1.toInt)
+    }
+    rst
+}
+
+def calculate_age(line1: String, line2: String ): Int = {
+    val date1 = line1.split("/").map(x => x.toInt)
+    val date2 = line2.split("/").map(x => x.toInt)
+    val today = if (date1(2) > date2(2)) date1 else date2
+    val birthday = if (date1(2) <= date2(2)) date1 else date2
+    val age = today(2) - birthday(2)
+    if (today(0) < birthday(0) || today(0) == birthday(0) && today(1) < birthday(1)) {
+	return age - 1
+    }
+    age
+}
+
+def avg_age(line: Iterable[Int]): Int = {
+    var sum = 0
+    var count = 0
+    for(i <- line) {
+        sum = sum + i
+        count = count + 1
+    }
+    sum / count
+}
+
+import java.util.Calendar
+import java.text.SimpleDateFormat
+val date = Calendar.getInstance.getTime
+val Format = new SimpleDateFormat("MM/dd/yyyy")
+val todayDate = Format.format(date)
+
+val soc = sc.textFile("/socNetData/networkdata/soc-LiveJournal1Adj.txt").map(line => line.split("\t")).filter(_.length > 1).map(line => (line(0) -> (line(1).split(","))))
+val dir_friend = soc.flatMap(direct_friend_pair)
+val userdata = sc.textFile("/socNetData/userdata/userdata.txt").map(_.split(","))
+val age = userdata.map(line => (line(0), calculate_age(line(9), todayDate)))
+val rst1 = dir_friend.join(age).map(line => line._2).groupByKey().mapValues(avg_age)
+val info = userdata.map(line => (line(0).toInt,(line(3)+","+line(4)+","+line(5))))
+val rst = rst1.join(info).map(line => (line._2._1,(line._1,line._2._2))).sortByKey(false).map(line => (line._2._1,(line._2._2 + " " + line._1.toString))).take(20).foreach(println)
