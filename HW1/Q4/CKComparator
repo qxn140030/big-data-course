@@ -5,9 +5,9 @@ import org.apache.hadoop.io.WritableComparator;
 
 public class CKComparator extends WritableComparator {
 
-	protected CKComparator() {
+    protected CKComparator() {
 		super(UserAgeWritable.class, true);
-	}
+    }
 	
 	public int compare(WritableComparable w1, WritableComparable w2) {
 		UserAgeWritable ck1 = (UserAgeWritable)w1;
