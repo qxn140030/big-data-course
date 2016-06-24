@@ -18,12 +18,12 @@ public class Q1 {
         public void map(LongWritable key, Text value, Context context) throws IOException, InterruptedException {
             String line = value.toString();
             String[] userAndFriends = line.split("\t");
-            if(userAndFriends.length == 1) {
+            if (userAndFriends.length == 1) {
             	IntWritable Key = new IntWritable();
             	Key.set(Integer.parseInt(userAndFriends[0]));
             	context.write(Key, new Text("0, 0"));
             }
-            if(userAndFriends.length == 2) {
+            if (userAndFriends.length == 2) {
                 String user = userAndFriends[0];
                 IntWritable userKey = new IntWritable(Integer.parseInt(user));
                 String[] friends = userAndFriends[1].split(",");
@@ -39,7 +39,7 @@ public class Q1 {
                     context.write(userKey, friend1Value);   // Paths of length 1.
                     friend1Key.set(Integer.parseInt(friend1));
                     friend1Value.set("2," + friend1);
-                    for (int j = i+1; j < friends.length; j++) {
+                    for (int j = i + 1; j < friends.length; j++) {
                         friend2 = friends[j];
                         friend2Key.set(Integer.parseInt(friend2));
                         friend2Value.set("2," + friend2);
@@ -53,11 +53,11 @@ public class Q1 {
  
     public static class Reduce extends Reducer<IntWritable, Text, IntWritable, Text> {
         public void reduce(IntWritable key, Iterable<Text> values, Context context) throws IOException, InterruptedException {
-        	String[] value;
+            String[] value;
             HashMap<String, Integer> hash = new HashMap<String, Integer>();
             for (Text val : values) {
                 value = (val.toString()).split(",");
-                if(value[0].equals("2")) { // Paths of length 2.
+                if (value[0].equals("2")) {                 // Paths of length 2.
                     if (hash.containsKey(value[1])) {
                         if (hash.get(value[1]) != -1) {
                             hash.put(value[1], hash.get(value[1]) + 1);
@@ -66,7 +66,7 @@ public class Q1 {
                         hash.put(value[1], 1);
                     }
                     
-                } else if(value[0].equals("1")) {  // Paths of length 1.
+                } else if(value[0].equals("1")) {         // Paths of length 1.
                     hash.put(value[1], -1);
                 } 
             }
@@ -78,15 +78,15 @@ public class Q1 {
                 }
             }
          
-         // Sort key-value pairs in the list by values (number of common friends).
+            // Sort key-value pairs in the list by values (number of common friends).
             Collections.sort(list, new Comparator<Entry<String, Integer>>() {
                 public int compare(Entry<String, Integer> e1, Entry<String, Integer> e2) {
-                	int n = e2.getValue().compareTo(e1.getValue());
-                	if(n == 0) {
-                		return Integer.parseInt(e1.getKey()) - (Integer.parseInt(e2.getKey()));
-                	} else {
-                		return n;
-                	}                    
+                    int n = e2.getValue().compareTo(e1.getValue());
+                    if (n == 0) {
+                	return Integer.parseInt(e1.getKey()) - (Integer.parseInt(e2.getKey()));
+                    } else {
+                	return n;
+                    }                    
                 }
             });
             int MAX = 10;
@@ -97,7 +97,6 @@ public class Q1 {
                 top.add(list.get(i).getKey());
             }
             context.write(key, new Text(StringUtils.join(",", top)));
-            
         }
     }
  
