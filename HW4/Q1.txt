@@ -1,0 +1,37 @@
+/*
+ * Using Pig Latin script.
+ * list the unique userid of female users whose age between 20 - 35 and who has rated the lowest rated Action AND War movies. 
+ * Print only users whose zip starts with 1. 
+ */
+
+MOVIES = load 'hdfs://cshadoop1/Spring-2016-input/movies.dat' using PigStorage(':') as (MovieID:chararray, Title:chararray, Genres:chararray);
+
+AW_MOVIES = filter MOVIES by Genres matches '.*Action.*\\|War.*';     --(MovieID,Title,Genres:Action.*|War)
+
+RATINGS = load 'hdfs://cshadoop1/Spring-2016-input/ratings.dat' using PigStorage(':') as (UserID:chararray, MovieID:chararray, Rating:float, Timestamp:chararray);
+
+AW_RATINGS = join AW_MOVIES by MovieID, RATINGS by MovieID;     --(MovieID,Titile,Genres:Action.*|War,UserID,MovieID,Rating,Timestamp)
+
+AW_MOVIEID_RATINGS = group AW_RATINGS by AW_MOVIES::MovieID;     --(MovieID,{(MovieID,Title,Genres:Action.*|War,UserID,MovieID,Rating,Timestamp),(...),...})
+
+AW_MOVIEID_AVGR = foreach AW_MOVIEID_RATINGS generate group, AVG(AW_RATINGS.Rating) as Avgrating;    --(MovieID,Avgrating)
+
+ORDER_AW_MOVIEID_AVGR = order AW_MOVIEID_AVGR by Avgrating asc;
+
+LOWEST = limit ORDER_AW_MOVIEID_AVGR 1;     --(MovieID,1.603)   --MovieID(2818)
+
+USERS = load 'hdfs://cshadoop1/Spring-2016-input/users.dat' using PigStorage(':') as (UserID:chararray, Gender:chararray, Age:int, Occupation:chararray, Zipcode:chararray);
+
+F = filter USERS by Gender eq 'F';
+
+Y_F = filter F by Age >= 20 AND Age <= 35;
+
+Y_F_ZIP = filter Y_F by Zipcode matches '1.+';    --(UserID,F,20-35,Occupation,1****)
+
+LOWEST_MOVIES = join LOWEST by $0, RATINGS by MovieID;    --(MovieID,1.603,UserID,MovieID,Rating,Timestamp)
+
+F_LOWEST = join Y_F_ZIP by $0, LOWEST_MOVIES by $2;     --(UserID,F,20-35,Occupation,1****,MovieID,1.603,UserID,MovieID,Rating,Timestamp)
+
+RESULT = foreach F_LOWEST generate $0,$1,$2,$3,$4;      --(UserID,F,20-35,Occupation,1****)
+
+dump RESULT     --(UserID:673, 1010, 1835, 2931)
