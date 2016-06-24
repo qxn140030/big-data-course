@@ -13,6 +13,7 @@ import org.apache.hadoop.mapreduce.lib.output.TextOutputFormat;
 import org.apache.hadoop.util.StringUtils;
 
 /*
+ * Write MapReduce program in Hadoop:
  * For each user U, the algorithm recommends 10 users who are not already friends with U, 
  * but have the largest number of mutual friends in common with U.
  */
