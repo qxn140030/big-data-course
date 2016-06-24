@@ -9,9 +9,9 @@ public class CKComparator extends WritableComparator {
 		super(UserAgeWritable.class, true);
 	}
 	
-	public int compare(WritableComparable e1, WritableComparable e2) {
-		UserAgeWritable ck1 = (UserAgeWritable)e1;
-		UserAgeWritable ck2 = (UserAgeWritable)e2;
+	public int compare(WritableComparable w1, WritableComparable w2) {
+		UserAgeWritable ck1 = (UserAgeWritable)w1;
+		UserAgeWritable ck2 = (UserAgeWritable)w2;
 		Integer userid1 = new Integer(ck1.getUserId());
 		Integer userid2 = new Integer(ck2.getUserId());;
 		Float avgAge1 = ck1.getAvgAge();
