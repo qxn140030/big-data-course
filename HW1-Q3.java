@@ -21,6 +21,10 @@ import org.apache.hadoop.mapreduce.lib.input.TextInputFormat;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 import org.apache.hadoop.mapreduce.lib.output.TextOutputFormat;
 
+/*
+ * Use in-memory join. Given any two Users as input, output the list of the names and the zipcode of their mutual friends. 
+ */
+ 
 public class Q3 {
 	
 	public static class Map extends Mapper<LongWritable, Text, Text, Text> {
