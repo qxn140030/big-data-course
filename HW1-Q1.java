@@ -11,7 +11,12 @@ import org.apache.hadoop.mapreduce.lib.input.TextInputFormat;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 import org.apache.hadoop.mapreduce.lib.output.TextOutputFormat;
 import org.apache.hadoop.util.StringUtils;
- 
+
+/*
+ For each user U, the algorithm recommends 10 users who are not already friends with U, 
+ but have the largest number of mutual friends in common with U.
+*/
+
 public class Q1 {
 	
     public static class Map extends Mapper<LongWritable, Text, IntWritable, Text> {
